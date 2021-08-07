@@ -1,23 +1,29 @@
 const express = require("express"); // importing express
+const cors = require("cors");
 const app = express(); // create an express application
-const port = 3000; // definte a port
+const port = 5000; // definte a port
+
+app.use(cors());
 
 app.get("/", (request, response) => {
-  const friends = [
-    {
-      name: "Muhammad Ahsan Ayaz",
-      designation: "Software Architect",
-    },
-    {
-      name: "Muhammad Ahsan Ayaz",
-      designation: "Software Architect",
-    },
-  ];
-  response.json(friends); // JSON = Javascript Object Notation
+  response.send("Hello world!");
 });
 
-app.get("/learners", (request, response) => {
-  response.send("Hello Learners!");
+app.get("/notes", (request, response) => {
+  // {text, link, tasks, dueDate}
+  const notesData = [
+    {
+      text: "Ahsan's Twitch",
+      link: "https://twitch.tv/codewithahsan",
+    },
+    {
+      text: "Get a job",
+      link: "https://rozee.pk",
+    },
+  ];
+  response.json({
+    notes: notesData,
+  });
 });
 
 app.listen(port, () => {
