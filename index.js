@@ -2,7 +2,7 @@ const express = require("express"); // importing express
 require("dotenv").config();
 const cors = require("cors");
 const app = express(); // create an express application
-const port = 5000; // definte a port
+const port = process.env.PORT || 5000; // definte a port
 require("./db");
 
 app.use(express.json());
