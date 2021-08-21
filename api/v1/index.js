@@ -1,12 +1,12 @@
 const express = require("express"); // importing express
 var notesRouter = express.Router();
-const Note = require("../../db/models/note.model");
+const NoteModel = require("../../db/models/note.model");
 
 /**
  * Get all notes
  */
 notesRouter.get("/", (request, response) => {
-  Note.find({}, (err, notes) => {
+  NoteModel.find({}, (err, notes) => {
     if (err) {
       return console.error(err);
     }
@@ -20,7 +20,7 @@ notesRouter.get("/", (request, response) => {
  * Add a new note
  */
 notesRouter.post("/", (request, response) => {
-  const newNote = new Note(request.body);
+  const newNote = new NoteModel(request.body);
   newNote.save().then((savedNote) => {
     response.json({
       note: savedNote,
@@ -33,8 +33,20 @@ notesRouter.post("/", (request, response) => {
  * Get a note by id
  */
 notesRouter.get("/:id", (request, response) => {
-  response.json({
-    reply: "note by id success",
+  const noteId = request.params.id;
+  NoteModel.findById(noteId, (err, note) => {
+    if (err) {
+      return console.log(err);
+    }
+    if (!note) {
+      return response.status(404).json({
+        message: "note not found",
+      });
+    }
+    response.json({
+      reply: "note by id success",
+      note,
+    });
   });
 });
 
@@ -42,9 +54,49 @@ notesRouter.get("/:id", (request, response) => {
  * Delete a note by id
  */
 notesRouter.delete("/:id", (request, response) => {
-  response.json({
-    reply: "note deleted",
+  const noteId = request.params.id;
+  NoteModel.findByIdAndRemove(noteId, (err, deletedNote) => {
+    if (err) {
+      return console.log(err);
+    }
+    if (!deletedNote) {
+      return response.status(404).json({
+        message: "note not found for deletion",
+      });
+    }
+    response.json({
+      reply: "delete note by id success",
+    });
   });
+});
+
+/**
+ * Update note by Id
+ */
+notesRouter.put("/:id", (request, response) => {
+  const noteId = request.params.id;
+  const updatedBody = request.body;
+  NoteModel.findByIdAndUpdate(
+    noteId,
+    updatedBody,
+    {
+      new: true,
+    },
+    (err, updatedNote) => {
+      if (err) {
+        return console.log(err);
+      }
+      if (!updatedNote) {
+        return response.status(404).json({
+          message: "note not found for updating",
+        });
+      }
+      response.json({
+        reply: "updated note by id success",
+        note: updatedNote,
+      });
+    }
+  );
 });
 
 module.exports = {
